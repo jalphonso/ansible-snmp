@@ -1,5 +1,5 @@
 This playbook demonstrates how to install the
-minimum SNMPv3 configuration.
+minimum SNMPv3 configuration on a Junos device.
 
 To run simply execute:
 ```ansible-playbook -i hosts site.yml -vv```

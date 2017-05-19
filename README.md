@@ -1,8 +1,11 @@
 This playbook demonstrates how to install the
 minimum SNMPv3 configuration on a Junos device.
 
-To run simply execute:
-```ansible-playbook -i hosts site.yml -vv```
+To run, update credentials in group_vars/all.yml,
+list of hosts in site.yml, and execute:
+```
+ansible-playbook -i hosts site.yml -vv
+```
 
 A diff of the config will be saved for each
 device with a timestamp.

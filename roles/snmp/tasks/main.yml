@@ -7,5 +7,6 @@
     diffs_file: "{{ inventory_hostname }}-{{ mydate }}-config.diff"
     host: "{{ inventory_hostname }}"
     replace: yes
-    user: user1
+    user: "{{ username }}"
+    passwd: "{{ password }}"
     timeout: 60

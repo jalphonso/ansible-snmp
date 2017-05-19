@@ -1,0 +1,8 @@
+set snmp v3 usm local-engine user mysecretv3username authentication-sha authentication-password mysecretv3password
+set snmp v3 usm local-engine user mysecretv3username privacy-aes128 privacy-password mysecretv3password
+set snmp v3 vacm security-to-group security-model usm security-name mysecretv3username group ALL-ACCESS
+set snmp v3 vacm access group ALL-ACCESS default-context-prefix security-model usm security-level privacy read-view GLOBAL
+set snmp v3 vacm access group ALL-ACCESS default-context-prefix security-model usm security-level privacy write-view GLOBAL
+set snmp v3 vacm access group ALL-ACCESS default-context-prefix security-model usm security-level privacy notify-view GLOBAL
+set snmp engine-id use-default-ip-address
+set snmp view GLOBAL oid internet include

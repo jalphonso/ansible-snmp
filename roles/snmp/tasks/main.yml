@@ -1,12 +1,41 @@
 ---
+
 - name: Get TimeDateStamp
   set_fact: mydate="{{lookup('pipe','date +%Y%m%d%H%M%S')}}"
+
+- name: Set Diff file variable
+  set_fact:
+      diffs_file: "{{ inventory_hostname }}-{{ mydate }}-config.diff"
+
+- name: create temporary file
+  tempfile:
+    state: file
+    suffix: .set
+  register: snmp_temp_file
+
+- name: Build config snippet from template
+  template:
+    src: ../templates/snmp.j2
+    dest: "{{ snmp_temp_file.path }}"
+
 - name: Deploy Junos config to device
   junos_install_config:
-    file: roles/snmp/files/snmp.set
-    diffs_file: "{{ inventory_hostname }}-{{ mydate }}-config.diff"
+    file:  "{{ snmp_temp_file.path }}"
+    diffs_file: "{{ diffs_file }}"
     host: "{{ inventory_hostname }}"
+    check_commit: false
     replace: yes
     user: "{{ username }}"
-    passwd: "{{ password }}"
+    passwd: "{{password|default()}}"
+    port: 22
     timeout: 60
+  register: junos_install_config_result
+
+- name: Delete temporary file for security reasons
+  file:
+    path: "{{ snmp_temp_file.path }}"
+    state: absent
+
+- name: proceed with config changes if needed
+  import_tasks: commit_confirmed_tasks.yml
+  when: junos_install_config_result|changed

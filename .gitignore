@@ -2,3 +2,5 @@ backup/
 *.retry
 *.conf
 *.diff
+*.swp
+hosts

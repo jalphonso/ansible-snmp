@@ -1,0 +1,69 @@
+---
+
+- name: cat diffs_file
+  debug:
+    msg: "{{lookup('file','{{ diffs_file }}').split('\n')}}"
+
+- name: Pausing for user to review configuration changes for all hosts
+  pause:
+    prompt: "Please review configuration changes"
+    minutes: 10
+
+- name: Get TimeDateStamp
+  set_fact: mydate="{{lookup('pipe','date +%Y%m%d%H%M%S')}}"
+
+- name: Set Diff file variable
+  set_fact:
+      committed_diffs_file: "{{ inventory_hostname }}-{{ mydate }}-config.diff"
+
+- name: create temporary file
+  tempfile:
+    state: file
+    suffix: .set
+  register: snmp_temp_file
+
+- name: Build config snippet from template
+  template:
+    src: ../templates/snmp.j2
+    dest: "{{ snmp_temp_file.path }}"
+
+- name: pushing config (Commit Confirmed)
+  junos_install_config:
+    file:  "{{ snmp_temp_file.path }}"
+    diffs_file: "{{ committed_diffs_file }}"
+    host: "{{ inventory_hostname }}"
+    confirm: 10
+    replace: yes
+    user: "{{ username }}"
+    passwd: "{{password|default()}}"
+    port: 22
+    timeout: 60
+  register: junos_install_config_result
+
+- name: Delete temporary file for security reasons
+  file:
+    path: "{{ snmp_temp_file.path }}"
+    state: absent
+
+- name: checking diffs from pre and post commit
+  command: diff -I SECRET-DATA {{ diffs_file }} {{ committed_diffs_file }}
+  failed_when: "diff.rc > 0"
+  changed_when: False
+  register: diff
+
+- name: Wait 10 seconds for port 22 to become open and contain "OpenSSH"
+  wait_for:
+    port: 22
+    host: '{{ (ansible_ssh_host|default(ansible_host))|default(inventory_hostname) }}'
+    search_regex: OpenSSH
+    delay: 10
+    timeout: 30
+  connection: local
+
+- name: Issuing secondary commit to finalize configuration
+  junos_commit:
+    host: "{{ inventory_hostname }}"
+    user: "{{ username }}"
+    passwd: "{{password|default()}}"
+    port: 22
+    timeout: 60

@@ -6,3 +6,12 @@
   roles:
   - role: Juniper.junos
   - role: snmp
+  vars_prompt:
+    - name: snmp_auth_user
+      prompt: "Enter the snmp v3 user name"
+
+    - name: snmp_auth_pass
+      prompt: "Enter the snmp v3 authentication plain text password"
+
+    - name: snmp_priv_pass
+      prompt: "Enter the snmp v3 privacy plain text password"

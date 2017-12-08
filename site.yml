@@ -1,17 +1,56 @@
 ---
 
-- hosts: routers
+- hosts: all
   connection: local
   gather_facts: no
   roles:
   - role: Juniper.junos
+  - role: common
   - role: snmp
+  - role: space
   vars_prompt:
+    - name: device_username
+      prompt: "Enter the device ssh user name"
+      private: no
+
+    - name: device_password
+      prompt: "Enter the device ssh password"
+      private: yes
+      confirm: yes
+
     - name: snmp_auth_user
       prompt: "Enter the snmp v3 user name"
+      private: no
+
+    - name: snmp_auth_type
+      prompt: "Enter the snmp auth type (only MD5 works at this time)"
+      default: "MD5"
+      private: no
 
     - name: snmp_auth_pass
       prompt: "Enter the snmp v3 authentication plain text password"
+      private: yes
+      confirm: yes
+
+    - name: snmp_priv_type
+      prompt: "Enter the snmp priv type AES128/DES"
+      default: "AES128"
+      private: no
 
     - name: snmp_priv_pass
       prompt: "Enter the snmp v3 privacy plain text password"
+      private: yes
+      confirm: yes
+
+    - name: space_ip
+      prompt: "Enter the space IP address"
+      private: no
+
+    - name: space_user
+      prompt: "Enter the space username"
+      private: no
+
+    - name: space_pass
+      prompt: "Enter the space password"
+      private: yes
+      confirm: yes

@@ -1,0 +1,43 @@
+---
+
+- name: create temporary file
+  tempfile:
+    state: file
+    suffix: .json
+  register: space_json_file
+  tags: space
+
+- name: Build config snippet from template
+  template:
+    src: ../templates/device_json.j2
+    dest: "{{ space_json_file.path }}"
+  tags: space
+
+- name: Send REST call to Junos Space to add device
+  uri:
+    url: "https://{{ space_ip }}/api/space/device-management/discover-devices"
+    method: POST
+    user: "{{ space_user }}"
+    password: "{{ space_pass }}"
+    body: "{{ lookup('file','{{ space_json_file.path }}') }}"
+    force_basic_auth: yes
+    validate_certs: no
+    return_content: yes
+    body_format: json
+    status_code: 202
+    headers:
+      Accept: "application/vnd.net.juniper.space.job-management.task+json;version=1"
+      Content-Type: "application/vnd.net.juniper.space.device-management.discover-devices+json;version=2;charset=UTF-8"
+  register: REST_job_result
+  tags: space
+
+- name: Send Job ID from previous REST call
+  debug:
+    var: REST_job_result.content|from_json
+  tags: space
+
+- name: Delete temporary file for security reasons
+  file:
+    path: "{{ space_json_file.path }}"
+    state: absent
+  tags: space

@@ -3,29 +3,36 @@
 - name: cat diffs_file
   debug:
     msg: "{{lookup('file','{{ diffs_file }}').split('\n')}}"
+  tags: snmp
 
 - name: Pausing for user to review configuration changes for all hosts
   pause:
     prompt: "Please review configuration changes"
     minutes: 10
+  tags: snmp
 
 - name: Get TimeDateStamp
-  set_fact: mydate="{{lookup('pipe','date +%Y%m%d%H%M%S')}}"
+  set_fact:
+    mydate: "{{lookup('pipe','date +%Y%m%d%H%M%S')}}"
+  tags: snmp
 
 - name: Set Diff file variable
   set_fact:
-      committed_diffs_file: "{{ inventory_hostname }}-{{ mydate }}-config.diff"
+    committed_diffs_file: "{{ inventory_hostname }}-{{ mydate }}-config.diff"
+  tags: snmp
 
 - name: create temporary file
   tempfile:
     state: file
     suffix: .set
   register: snmp_temp_file
+  tags: snmp
 
 - name: Build config snippet from template
   template:
     src: ../templates/snmp.j2
     dest: "{{ snmp_temp_file.path }}"
+  tags: snmp
 
 - name: pushing config (Commit Confirmed)
   junos_install_config:
@@ -34,22 +41,25 @@
     host: "{{ inventory_hostname }}"
     confirm: 10
     replace: yes
-    user: "{{ username }}"
-    passwd: "{{password|default()}}"
+    user: "{{ device_username }}"
+    passwd: "{{device_password|default()}}"
     port: 22
     timeout: 60
   register: junos_install_config_result
+  tags: snmp
 
 - name: Delete temporary file for security reasons
   file:
     path: "{{ snmp_temp_file.path }}"
     state: absent
+  tags: snmp
 
 - name: checking diffs from pre and post commit
   command: diff -I SECRET-DATA {{ diffs_file }} {{ committed_diffs_file }}
   failed_when: "diff.rc > 0"
   changed_when: False
   register: diff
+  tags: snmp
 
 - name: Wait 10 seconds for port 22 to become open and contain "OpenSSH"
   wait_for:
@@ -59,11 +69,13 @@
     delay: 10
     timeout: 30
   connection: local
+  tags: snmp
 
 - name: Issuing secondary commit to finalize configuration
   junos_commit:
     host: "{{ inventory_hostname }}"
-    user: "{{ username }}"
-    passwd: "{{password|default()}}"
+    user: "{{ device_username }}"
+    passwd: "{{device_password|default()}}"
     port: 22
     timeout: 60
+  tags: snmp

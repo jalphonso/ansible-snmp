@@ -1,0 +1,14 @@
+{
+  "discover-devices":{
+     "ipAddressDiscoveryTarget": { "exclude":false, "ipAddress":"{{ ansible_host }}" },
+     "usePing":false,
+     "useSnmp":true,
+     "snmpV3Setting":{
+        "userName":"{{ snmp_auth_user }}","authenticationType":"{{ snmp_auth_type }}", "privacyType":"{{ snmp_priv_type }}",
+        "authenticationPassword": "{{ snmp_auth_pass }}", "privacyPassword":"{{ snmp_priv_pass }}"
+     },
+     "manageDiscoveredSystemsFlag":true,
+     "sshCredential": { "userName":"{{ device_username}}",
+"password":"{{ device_password }}"}
+   }
+}

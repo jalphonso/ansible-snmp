@@ -1,0 +1,11 @@
+---
+- name: Normalize and save snmp_auth_type
+  set_fact:
+    snmp_priv_type: "{% if snmp_priv_type.strip().upper() == 'AES128' or snmp_priv_type.strip().upper() == 'AES' %}AES128{% else %}DES{% endif %}"
+    snmp_junos_priv_type: "{% if snmp_priv_type.strip().upper() == 'AES128' %}privacy-aes128{% else %}privacy-des{% endif %}"
+
+#snmp_auth_type and snmp_junos_auth_type will always resolve to their relative
+#md5 values since sha doesn't work via REST with Junos Space 17.1 as of Dec 2017
+    snmp_auth_type: "{% if snmp_auth_type.strip().upper() == 'MD5' %}MD5{% else %}MD5{% endif %}"
+    snmp_junos_auth_type: "{% if snmp_auth_type.strip().upper() == 'MD5' %}authentication-md5{% else %}authentication-md5{% endif %}"
+    tags: always

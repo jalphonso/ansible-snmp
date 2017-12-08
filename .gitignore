@@ -4,3 +4,4 @@ backup/
 *.diff
 *.swp
 hosts
+site.private.yml

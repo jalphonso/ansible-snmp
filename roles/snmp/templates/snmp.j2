@@ -1,5 +1,5 @@
-set snmp v3 usm local-engine user {{ snmp_auth_user }} authentication-sha authentication-password {{ snmp_auth_pass }}
-set snmp v3 usm local-engine user {{ snmp_auth_user }} privacy-aes128 privacy-password {{ snmp_priv_pass }}
+set snmp v3 usm local-engine user {{ snmp_auth_user }} {{ snmp_junos_auth_type }} authentication-password {{ snmp_auth_pass }}
+set snmp v3 usm local-engine user {{ snmp_auth_user }} {{ snmp_junos_priv_type }} privacy-password {{ snmp_priv_pass }}
 set snmp v3 vacm security-to-group security-model usm security-name {{ snmp_auth_user }} group ALL-ACCESS
 set snmp v3 vacm access group ALL-ACCESS default-context-prefix security-model usm security-level privacy read-view GLOBAL
 set snmp v3 vacm access group ALL-ACCESS default-context-prefix security-model usm security-level privacy write-view GLOBAL

@@ -1,13 +1,19 @@
 ---
-
 - name: Get TimeDateStamp
   set_fact:
     mydate: "{{lookup('pipe','date +%Y%m%d%H%M%S')}}"
   tags: snmp
 
-- name: Set Diff file variable
+- name: Set build path
   set_fact:
-    diffs_file: "{{ inventory_hostname }}-{{ mydate }}-config.diff"
+    build_path_pre: "build/{{ inventory_hostname }}/{{ mydate}}"
+  tags: snmp
+
+- name: Create subdirectory for storing configs and diffs
+  file:
+    path: "{{ build_path_pre }}"
+    state: directory
+    mode: 0770
   tags: snmp
 
 - name: create temporary file
@@ -23,18 +29,19 @@
     dest: "{{ snmp_temp_file.path }}"
   tags: snmp
 
-- name: Deploy Junos config to device
-  junos_install_config:
-    file:  "{{ snmp_temp_file.path }}"
-    diffs_file: "{{ diffs_file }}"
-    host: "{{ inventory_hostname }}"
-    check_commit: false
-    replace: yes
+- name: Push SNMP config without committing so user can review
+  juniper_junos_config:
     user: "{{ device_username }}"
-    passwd: "{{device_password|default()}}"
+    passwd: "{{ device_password }}"
+    load: set
+    src: "{{ snmp_temp_file.path }}"
+    dest_dir: "{{ build_path_pre }}"
+    diff: true
+    check: true
+    commit: false
     port: 22
     timeout: 60
-  register: junos_install_config_result
+  register: juniper_junos_config_result
   tags: snmp
 
 - name: Delete temporary file for security reasons
@@ -45,5 +52,5 @@
 
 - name: proceed with config changes if needed
   import_tasks: commit_confirmed_tasks.yml
-  when: junos_install_config_result|changed
+  when: juniper_junos_config_result|changed
   tags: snmp

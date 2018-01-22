@@ -2,13 +2,13 @@
 
 - name: cat diffs_file
   debug:
-    msg: "{{lookup('file','{{ diffs_file }}').split('\n')}}"
+    var: juniper_junos_config_result.diff_lines
   tags: snmp
 
 - name: Pausing for user to review configuration changes for all hosts
   pause:
     prompt: "Please review configuration changes"
-    minutes: 10
+    seconds: 20
   tags: snmp
 
 - name: Get TimeDateStamp
@@ -16,9 +16,16 @@
     mydate: "{{lookup('pipe','date +%Y%m%d%H%M%S')}}"
   tags: snmp
 
-- name: Set Diff file variable
+- name: Set build path
   set_fact:
-    committed_diffs_file: "{{ inventory_hostname }}-{{ mydate }}-config.diff"
+    build_path_post: "build/{{ inventory_hostname }}/{{ mydate}}"
+  tags: snmp
+
+- name: Create subdirectory for storing configs and diffs
+  file:
+    path: "{{ build_path_post }}"
+    state: directory
+    mode: 0770
   tags: snmp
 
 - name: create temporary file
@@ -34,18 +41,20 @@
     dest: "{{ snmp_temp_file.path }}"
   tags: snmp
 
-- name: pushing config (Commit Confirmed)
-  junos_install_config:
-    file:  "{{ snmp_temp_file.path }}"
-    diffs_file: "{{ committed_diffs_file }}"
-    host: "{{ inventory_hostname }}"
-    confirm: 10
-    replace: yes
+- name: Push SNMP config with commit confirmed
+  juniper_junos_config:
     user: "{{ device_username }}"
-    passwd: "{{device_password|default()}}"
+    passwd: "{{ device_password }}"
+    load: set
+    src: "{{ snmp_temp_file.path }}"
+    dest_dir: "{{ build_path_post }}"
+    diff: true
+    check: false
+    commit: true
+    confirmed: 10
     port: 22
     timeout: 60
-  register: junos_install_config_result
+  register: juniper_junos_config_result
   tags: snmp
 
 - name: Delete temporary file for security reasons
@@ -55,7 +64,7 @@
   tags: snmp
 
 - name: checking diffs from pre and post commit
-  command: diff -I SECRET-DATA {{ diffs_file }} {{ committed_diffs_file }}
+  command: diff -I SECRET-DATA {{ build_path_pre }}/{{ inventory_hostname }}.diff {{ build_path_post }}/{{ inventory_hostname }}.diff
   failed_when: "diff.rc > 0"
   changed_when: False
   register: diff
@@ -71,11 +80,13 @@
   connection: local
   tags: snmp
 
-- name: Issuing secondary commit to finalize configuration
-  junos_commit:
-    host: "{{ inventory_hostname }}"
+- name: Issuing secondary commit to finalize changes
+  juniper_junos_config:
     user: "{{ device_username }}"
-    passwd: "{{device_password|default()}}"
+    passwd: "{{ device_password }}"
+    diff: false
+    check: false
+    commit: true
     port: 22
     timeout: 60
   tags: snmp

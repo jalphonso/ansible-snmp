@@ -23,8 +23,8 @@
       private: no
 
     - name: snmp_auth_type
-      prompt: "Enter the snmp auth type (only MD5 works at this time)"
-      default: "MD5"
+      prompt: "Enter the snmp auth type (MD5|SHA1)"
+      default: "SHA1"
       private: no
 
     - name: snmp_auth_pass
@@ -33,7 +33,7 @@
       confirm: yes
 
     - name: snmp_priv_type
-      prompt: "Enter the snmp priv type AES128/DES"
+      prompt: "Enter the snmp priv type (AES128/DES)"
       default: "AES128"
       private: no
 

@@ -6,6 +6,6 @@
 
 #snmp_auth_type and snmp_junos_auth_type will always resolve to their relative
 #md5 values since sha doesn't work via REST with Junos Space 17.1 as of Dec 2017
-    snmp_auth_type: "{% if snmp_auth_type.strip().upper() == 'MD5' %}MD5{% else %}MD5{% endif %}"
-    snmp_junos_auth_type: "{% if snmp_auth_type.strip().upper() == 'MD5' %}authentication-md5{% else %}authentication-md5{% endif %}"
+    snmp_auth_type: "{% if snmp_auth_type.strip().upper() == 'MD5' %}MD5{% else %}SHA1{% endif %}"
+    snmp_junos_auth_type: "{% if snmp_auth_type.strip().upper() == 'MD5' %}authentication-md5{% else %}authentication-sha{% endif %}"
     tags: always

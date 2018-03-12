@@ -1,14 +1,31 @@
 {
-  "discover-devices":{
-     "ipAddressDiscoveryTarget": { "exclude":false, "ipAddress":"{{ ansible_host }}" },
-     "usePing":false,
-     "useSnmp":true,
-     "snmpV3Setting":{
-        "userName":"{{ snmp_auth_user }}","authenticationType":"{{ snmp_auth_type }}", "privacyType":"{{ snmp_priv_type }}",
-        "authenticationPassword": "{{ snmp_auth_pass }}", "privacyPassword":"{{ snmp_priv_pass }}"
-     },
-     "manageDiscoveredSystemsFlag":true,
-     "sshCredential": { "userName":"{{ device_username}}",
-"password":"{{ device_password }}"}
-   }
+  "add-device-discovery-rule-by-ip-request" : {
+    "discovery-profile-name" : "{{ ansible_host }}" ,
+    "use-ping" : false ,
+    "use-nat" : false ,
+    "use-snmp" : true ,
+    "sharable" : false ,
+    "device-targets" : {
+      "device-target" : {
+        "ip-address" : "{{ ansible_host }}" ,
+        "device-ssh-credentials" : {
+          "@total" : 1 ,
+          "device-ssh-credential" : {
+            "username" : "{{ device_username}}" ,
+            "keybased" : false ,
+            "credential-type" : "CREDENTIAL_BASED" ,
+            "password" : "{{ device_password }}"
+          }
+        }
+      }
+    },
+    "device-snmp-details" : {
+      "authentication-password" : "{{ snmp_auth_pass }}" ,
+      "privacy-password" : "{{ snmp_priv_pass }}" ,
+      "user-name" : "{{ snmp_auth_user }}" ,
+      "snmp-auth-type" : "{{ snmp_auth_type }}" ,
+      "privacy-type" : "{{ snmp_priv_type }}"
+    },
+    "device-snmp-version" : "SNMPV3"
+  }
 }

@@ -15,7 +15,7 @@
 
 - name: Send REST call to Junos Space to add device
   uri:
-    url: "https://{{ space_ip }}/api/space/device-management/discover-devices"
+    url: "https://{{ space_ip }}/api/space/device-management/device-discovery-rules"
     method: POST
     user: "{{ space_user }}"
     password: "{{ space_pass }}"
@@ -27,7 +27,7 @@
     status_code: 202
     headers:
       Accept: "application/vnd.net.juniper.space.job-management.task+json;version=1"
-      Content-Type: "application/vnd.net.juniper.space.device-management.discover-devices+json;version=2;charset=UTF-8"
+      Content-Type: "application/vnd.net.juniper.space.device-management.add-device-discovery-rule-by-ip-request+json;version=6;charset=UTF-8"
   register: REST_job_result
   tags: space
 

@@ -31,6 +31,7 @@
 
 - name: Push SNMP config without committing so user can review
   juniper_junos_config:
+    host: '{{ (ansible_ssh_host|default(ansible_host))|default(inventory_hostname) }}'
     user: "{{ device_username }}"
     passwd: "{{ device_password }}"
     load: set

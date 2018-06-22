@@ -11,10 +11,10 @@
         "device-ssh-credentials" : {
           "@total" : 1 ,
           "device-ssh-credential" : {
-            "username" : "{{ device_username}}" ,
+            "username" : "{{ lookup('env', 'ANSIBLE_NET_USERNAME') }}" ,
             "keybased" : false ,
             "credential-type" : "CREDENTIAL_BASED" ,
-            "password" : "{{ device_password }}"
+            "password" : "{{ lookup('env', 'ANSIBLE_NET_PASSWORD') }}"
           }
         }
       }

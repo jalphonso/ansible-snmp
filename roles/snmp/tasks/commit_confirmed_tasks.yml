@@ -44,8 +44,6 @@
 - name: Push SNMP config with commit confirmed
   juniper_junos_config:
     host: '{{ (ansible_ssh_host|default(ansible_host))|default(inventory_hostname) }}'
-    user: "{{ device_username }}"
-    passwd: "{{ device_password }}"
     load: set
     src: "{{ snmp_temp_file.path }}"
     dest_dir: "{{ build_path_post }}"
@@ -84,8 +82,6 @@
 - name: Issuing secondary commit to finalize changes
   juniper_junos_config:
     host: '{{ (ansible_ssh_host|default(ansible_host))|default(inventory_hostname) }}'
-    user: "{{ device_username }}"
-    passwd: "{{ device_password }}"
     diff: false
     check: true
     commit: false

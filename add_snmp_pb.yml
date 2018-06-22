@@ -9,15 +9,6 @@
   - role: snmp
   - role: space
   vars_prompt:
-    - name: device_username
-      prompt: "Enter the device ssh user name"
-      private: no
-
-    - name: device_password
-      prompt: "Enter the device ssh password"
-      private: yes
-      confirm: yes
-
     - name: snmp_auth_user
       prompt: "Enter the snmp v3 user name"
       private: no

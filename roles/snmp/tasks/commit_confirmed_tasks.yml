@@ -87,8 +87,8 @@
     user: "{{ device_username }}"
     passwd: "{{ device_password }}"
     diff: false
-    check: false
-    commit: true
+    check: true
+    commit: false
     port: 22
     timeout: 60
   tags: snmp

@@ -1,4 +1,7 @@
+HOW_TO_RUN
 build/
+venv
+.venv
 *.retry
 *.conf
 *.diff
